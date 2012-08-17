@@ -1,0 +1,2 @@
+1. setup tomcat for startup and shutdown with ant tasks
+2. make running in debug mode feature

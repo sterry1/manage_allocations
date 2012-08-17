@@ -1,0 +1,71 @@
+
+
+XUP Domain Object Model relationships
+
+class Project
+
+	 String  chargeNumber;   // implied relationship outside of domain model
+	 String  grantNumber;    // implied relationship outside of domain model
+	 int     accountID;      // implied relationship outside of domain model
+	 int     piId;           // direct domain object relationship
+	 
+	 // direct object relationship
+	 Map<String,Allocation> allocations = new LinkedHashMap<String, Allocation>();
+
+class User
+
+    // no direct or implied domain object relationships
+
+class Allocation
+
+	 int    piID;               // direct domain object relationship
+	 String resource;           // implied relationship outside of domain model
+	 User[] users = null;       // direct domain object relationship
+	 User[] deadUsers = null;   // direct domain object relationship
+	 User[] allUsers = null;    // direct domain object relationship
+
+	 // ??? redundant relationship by id for sorting?
+	 HashMap<Integer, User> userHash = new HashMap<Integer, User>();
+
+
+
+TUP also has the idea of
+    ACCOUNT
+    GRANT
+    PUBLICATION
+
+
+XUP theme
+
+    <script type="text/javascript" src="/xup-alt-theme/js/jquery-1.5.2.min.js"></script>
+    <script type="text/javascript" src="/xup-alt-theme/js/jquery-ui-1.8.13.custom.min.js"></script>
+    <script type="text/javascript" src="/xup-alt-theme/js/jquery.tools.min.js"></script>
+    <script type="text/javascript" src="/xup-alt-theme/js/jquery.easing.js"></script>
+    <script type="text/javascript" src="/xup-alt-theme/js/datatables/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/xup-alt-theme/js/jquery.doTimeout.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/xup-alt-theme/css/smoothness/jquery-ui-1.8.13.custom.css"/>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    <link href="/xup-alt-theme/images/favicon.ico" rel="Shortcut Icon"/>
+    <link href="/html/portal/css.jsp?browserId=other&amp;themeId=xupalt_WAR_xupalttheme&amp;colorSchemeId=01&amp;minifierType=css&amp;languageId=en_US&amp;b=6012&amp;t=1311820220000"
+          rel="stylesheet" type="text/css"/>
+    <link href="/manage-allocation-portlet/css/view-alloc.css?browserId=other&amp;minifierType=css&amp;languageId=en_US&amp;b=6012&amp;t=1344546650000"
+          rel="stylesheet" type="text/css"/>
+    <link href="/html/portlet/journal_content/css/main.jsp?browserId=other&amp;themeId=xupalt_WAR_xupalttheme&amp;colorSchemeId=01&amp;minifierType=css&amp;languageId=en_US&amp;b=6012&amp;t=1344447519000"
+          rel="stylesheet" type="text/css"/>
+    <script type="text/javascript">/*<![CDATA[*/
+
+
+TUP theme
+
+    <script type="text/javascript" src="/tacc-user-portal-classic-black-theme/js/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="/tacc-user-portal-classic-black-theme/js/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="/tacc-user-portal-classic-black-theme/js/jquery-ui-1.8.11.custom.min.js"></script>
+    <script type="text/javascript" src="/tacc-user-portal-classic-black-theme/js/jquery.tools.tooltip.1.2.5.min.js"></script>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    <link rel="Shortcut Icon" href="/tacc-user-portal-classic-black-theme/images/favicon.ico"/>
+    <link href="/html/portal/css.jsp?browserId=other&amp;themeId=taccuserportalclassicblack_WAR_taccuserportalclassicblacktheme&amp;colorSchemeId=01&amp;minifierType=css&amp;languageId=en_US&amp;b=6011&amp;t=1344540338000"
+          rel="stylesheet" type="text/css"/>
+    <link href="/manage-allocation-portlet/css/view-alloc.css?browserId=other&amp;minifierType=css&amp;languageId=en_US&amp;b=6011&amp;t=1344621472000"
+          rel="stylesheet" type="text/css"/>
+    <link href="/tacc-allocations-portlet/css/main.css?browserId=other&amp;minifierType=css&amp;languageId=en_US&amp;b=6011&amp;t=1344540682000"
+          rel="stylesheet" type="text/css"/>

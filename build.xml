@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<project name="manage-allocation-portlet" basedir="." default="deploy">
+
+    <property name="liferay.sdk.dir" value="/Users/steve/toolbox/temp/projectexample/3.x-liferay-6-ee/liferay-plugins-sdk-6.0-ee-sp1"/>
+    <property file="${liferay.sdk.dir}/build.${user.name}.properties" />
+	<import file="../build-common-portlet.xml" />
+    <property name="portlet" value="${ant.project.name}"/>
+
+    <target name="undeploy.portlet">
+        <echo>"app.server.dir/webapps - ${app.server.dir}/webapps" </echo>
+        <property name="portlet.webapps" value="${app.server.dir}/webapps/${portlet}"/>
+        <echo>"portlet.webapps - ${portlet.webapps}" </echo>
+        <property name="portlet.work" value="${app.server.dir}/work/Catalina/localhost/${portlet}"/>
+        <delete dir="${portlet.webapps}" verbose="true"/>
+        <delete dir="${portlet.work}" verbose="true"/>
+    </target>
+
+    <target name="show.props">
+        <echoproperties/>
+    </target>
+
+    <!-- ============================================================ -->
+    <!-- Tomcat tasks -->
+    <!-- ============================================================ -->
+
+    <target name="tomcat.start">
+        <exec dir="${app.server.dir}/bin" executable="startup.sh" spawn="true" />
+    </target>
+
+    <target name="tomcat-start">
+        <exec executable="bash" newenvironment="false" dir=".">
+            <arg value="export CATALINA_HOME=$LIFERAY_HOME/tomcat-6.0.29; $CATALINA_HOME/bin/startup.sh"/>
+        </exec>
+    </target>
+
+</project>

@@ -1,0 +1,66 @@
+<h2>Usage for A-ccsc1: </h2>
+<a href="http://localhost:8080/user/sterry1/manage-allocations?p_p_id=manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1">&larr;
+    Back to allocations</a>
+<form action="" class="aui-form  " id="_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_fm"
+      name="_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_fm"> <span
+        class="aui-field aui-field-select aui-field-menu"> <span class="aui-field-content"> <label
+        class="aui-field-label-inline-label" for="_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_user">
+    Select a user to view user usage detail
+
+
+</label> <span class='aui-field-element '> <select class="aui-field-input aui-field-input-select aui-field-input-menu"
+                                                   id="_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_user"
+                                                   name="_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_user">
+    <option value=""> Summary
+    </option>
+</select> </span> </span> </span></form>
+<div id="_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_usage" class="usage-chart">Loading...</div>
+<script>
+    /*<![CDATA[*/
+    (function (a) {
+        a(document).ready(function () {
+            var e = {project:"0", allocation:"0", startDate:"2011-11", endDate:"2012-11"};
+            var b;
+            var c = {width:920, height:480, lineWidth:3, pointSize:6, hAxis:{slantedText:true}, vAxes:[
+                {title:"Number of jobs"},
+                {title:"SUs used"}
+            ], series:[
+                {color:"#035A8D", targetAxisIndex:0},
+                {color:"#9c4308", targetAxisIndex:1}
+            ], animation:{duration:500, easing:"inAndOut"}};
+
+            function d() {
+                b = new google.visualization.LineChart(document.getElementById("_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_usage"));
+                a.ajax({url:"http://localhost:8080/user/sterry1/manage-allocations?p_p_id=manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_count=1&_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_resourceRequest=usage", type:"post", dataType:"json", data:e, success:function (h) {
+                    var g = new google.visualization.DataTable();
+                    g.addColumn("string", "Month");
+                    g.addColumn("number", "Jobs");
+                    g.addColumn("number", "SUs");
+                    for (var f = 0; f < h.result.length; f++) {
+                        g.addRow([h.result[f].month, h.result[f].jobs, h.result[f].sus])
+                    }
+                    b.draw(g, c)
+                }})
+            }
+            google.load("visualization", "1", {packages: ["corechart"],callback: d});
+            a("#_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_user").bind("change", function() {
+                var f = a(this).val();
+                var g = {};
+                if (f != "") {
+                    g.user = f
+                }
+                a.extend(g, e);
+                a.ajax({url: "http://localhost:8080/user/sterry1/manage-allocations?p_p_id=manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_count=1&_manageallocations_WAR_manageallocationportlet_INSTANCE_w8Wu_resourceRequest=usage",type: "post",dataType: "json",data: g,success: function(k) {
+                    var j = new google.visualization.DataTable();
+                    j.addColumn("string", "Month");
+                    j.addColumn("number", "Jobs");
+                    j.addColumn("number", "SUs");
+                    for (var h = 0; h < k.result.length; h++) {
+                        j.addRow([k.result[h].month, k.result[h].jobs, k.result[h].sus])
+                    }
+                    b.draw(j, c)
+                }})
+            })
+        })
+    })(jQuery); /*]]>*/
+</script>

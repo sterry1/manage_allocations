@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<script type = "text/javascript">
+    window.onload = function()
+    {
+        // Define function objects
+        var func1   = function() { alert("hello from func1"); }
+        func1.func2 = function() { alert("hello from func1.func2"); };
+        var _       = function() { alert("hello from _"); }
+        var \\u0024  = function() { alert("hello from $ defined as \u0024"); }
+        var Ø       = function() { alert("hello from Ø"); }
+        var $$$$$   = function() { alert("hello from $$$$$"); }
+        var $func$  = function() { alert("hello from $func$"); }
+        var __      = function() { alert("hello from __"); }
+        _.$         = function() { alert("hello from _.$"); }
+        __.__       = function() { alert("hello from __.__"); }
+        $.member    = function() { alert("hello from $.member"); }
+
+        // Call functions defined above one by one
+        func1();
+        func1.func2();
+        _();
+        $();
+        Ø();
+        $$$$$();
+        $func$();
+        $.member();
+        _.$();
+        __();
+        __.__();
+    }
+</script>
+
+</body>
+</html>

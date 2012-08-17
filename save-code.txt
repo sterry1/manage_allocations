@@ -1,0 +1,478 @@
+/*
+	@Override
+	public void serveResource(ResourceRequest request, ResourceResponse response)
+			throws PortletException, IOException {
+		String username = null;
+		try {
+			username = getPortalUsername(request);
+		} catch (Exception e) {
+			username = "";
+			logger.error("Unable to retrieve portal username!", e);
+		}
+		String resource = ParamUtil.getString(request, RESOURCE_REQUEST);
+		if (resource.equals(DOWNLOAD_ALLOC_DATA)) {
+			PortletSession session = request.getPortletSession();
+			Project[] projects = (Project[]) session.getAttribute(SESS_PROJECT_LIST);
+			int p = Integer.parseInt(request.getParameter(PROJECT_IDX));
+			Project proj = projects[p];
+			int a = Integer.parseInt(request.getParameter(ALLOCATION_IDX));
+			Allocation alloc = projects[p].getAllocations()[a];
+			byte[] download = getAllocationDataCSVDownload(proj, alloc);
+			response.setContentType("text/csv");
+			response.setContentLength(download.length);
+			response.setProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + username + "_" + proj.getTitle().replaceAll("\\s+", "_") + "_" + alloc.getResource() + "_" + alloc.getFormattedStartDate().replace('-', '_') + ".csv");
+			response.getPortletOutputStream().write(download);
+			response.getPortletOutputStream().flush();
+			response.getPortletOutputStream().close();
+		} else if (resource.equals(PROJECT_USERS)) {
+			// ADMIN OVERRIDE
+			boolean admin = isAdmin(request);
+			request.setAttribute(ADMIN, admin);
+
+			int projIdx = Integer.parseInt(request.getParameter(PROJECT_IDX));
+			int allocIdx = Integer.parseInt(request.getParameter(ALLOCATION_IDX));
+			PortletSession session = request.getPortletSession();
+			Project[] projects = (Project[]) session.getAttribute(SESS_PROJECT_LIST);
+
+			Project p = projects[projIdx];
+			Allocation a = p.getAllocations()[allocIdx];
+			if (a.getUsers().length == 0) {
+				PersonGateway pg = new PersonGatewayXSEDE();
+				pg.populateUsers(p, a);
+				try {
+					pg.close();
+				} catch (SQLException e) {
+					logger.error("error closing PersonGateway connection", e);
+				}
+			}
+
+			try {
+				Resource r = new ResourceDao(getPortalDataSource()).getResource(a.getResource());
+				request.setAttribute("resourceActive", r.isActive());
+			} catch (NamingException e) {
+				logger.error(e);
+			}
+
+			request.setAttribute(PROJECT, p);
+			request.setAttribute(ALLOCATION, a);
+			request.setAttribute(PROJECT_IDX, projIdx);
+			request.setAttribute(ALLOCATION_IDX, allocIdx);
+			PortletRequestDispatcher rd = getPortletContext().getRequestDispatcher(VIEW_USERS);
+			rd.include(request, response);
+		} else if (resource.equals("usage")) {
+			try {
+				getUsage(request, response);
+			} catch (PortalException e) {
+				logger.error(e);
+			} catch (SystemException e) {
+				logger.error(e);
+			}
+		} else if (resource.equals("project_usage")) {
+			getProjectUsage(request, response);
+		}
+	}
+*/
+
+/**
+ * Creates a CSV document for a project/allocation with user data.
+ * @param project The project
+ * @param allocation The allocation
+ * @return the bytes of the generated CSV document
+ */
+/*
+	private byte[] getAllocationDataCSVDownload(Project project, Allocation allocation) {
+		StringBuilder data = new StringBuilder();
+		String delim = "\",\"";
+
+		// project and allocation header
+		data.append("\"PROJECT\"\n");
+		data.append("\"Project\",\"Start Date\",\"End Date\",\"Resource\",\"SU Remaining\",\"SUs Awarded\",\"% Remaining\",\"Alloc. Type\",\"State\"\n");
+
+		double base = Double.parseDouble(allocation.getBaseAllocation());
+		double rem = Double.parseDouble(allocation.getRemainingAllocation());
+		double perc = rem / base;
+
+		// project and alloc data
+		data.append("\"");
+		data.append(project.getTitle().replaceAll("\\s+", " "));
+		data.append(delim);
+		data.append(allocation.getFormattedStartDate());
+		data.append(delim);
+		data.append(allocation.getFormattedEndDate());
+		data.append(delim);
+		data.append(allocation.getResource());
+		data.append(delim);
+		data.append(allocation.getRemainingAllocation());
+		data.append(delim);
+		data.append(allocation.getBaseAllocation());
+		data.append(delim);
+		data.append(java.text.NumberFormat.getPercentInstance().format(perc));
+		data.append(delim);
+		data.append(allocation.getType());
+		data.append(delim);
+		data.append(allocation.getState());
+		data.append("\"\n\n\n");
+
+		// users header
+		data.append("\"USERS\"\n");
+		data.append("\"Name\",\"Portal Username\",\"Allocation Usage (SU)\",\"Contact Info\"\n");
+
+		// users data
+		for (User u : allocation.getUsers()) {
+			data.append("\"");
+			data.append(u.getFullNameLastFirst());
+			data.append(delim);
+			data.append(u.getUsername());
+			data.append(delim);
+			data.append(u.getUsedAllocation());
+			data.append(delim);
+			data.append(u.getEmail());
+			data.append("\"\n");
+		}
+		return data.toString().getBytes();
+	}
+*/
+
+/**
+ * Displays the edit mode screen for modifying this portlets preferences.
+ *
+ * @param request
+ *            a <code>RenderRequest</code> value
+ * @param response
+ *            a <code>RenderResponse</code> value
+ * @exception PortletException
+ *                if an error occurs
+ * @exception java.io.IOException
+ *                if an error occurs
+ */
+/*
+	public void doHelp(RenderRequest request, RenderResponse response)
+			throws PortletException, IOException {
+
+		PortletRequestDispatcher rd = null;
+		rd = getPortletContext().getRequestDispatcher(VIEW_HELP);
+		rd.include(request, response);
+	}
+
+*/
+
+/*
+	private void doMakeAllocationManager(ActionRequest request, ActionResponse response) {
+		int accountId = Integer.parseInt(request.getParameter(ACCOUNT_ID)),
+				personId = Integer.parseInt(request.getParameter(PERSON_ID));
+
+		PersonGateway pg = new PersonGatewayXSEDE();
+		if (pg.makeAllocationManager(accountId, personId)) {
+			request.getPortletSession().removeAttribute(SESS_PROJECT_LIST);
+			SessionMessages.add(request, "success-make-allocation-mgr");
+		} else {
+			SessionErrors.add(request, "error-make-allocation-mgr");
+			request.setAttribute(ACCOUNT_ID, accountId);
+			request.setAttribute(PERSON_ID, personId);
+			response.setRenderParameter(STATUS, CONFIRM);
+			response.setRenderParameter(ACTION, MAKE_ALLOCATION_MGR);
+		}
+		try {
+			pg.close();
+		} catch (SQLException e) {
+			logger.error(e);
+		}
+	}
+
+*/
+
+/*
+	protected DataSource getPortalDataSource() throws NamingException {
+		Context context = new InitialContext();
+		DataSource ds = (DataSource) context.lookup("java:/comp/env/jdbc/TGCDB-portal");
+		return ds;
+	}
+*/
+
+/**
+ * Reads in form parameters, sets them to the bean variables, and confirm
+ * with user
+ */
+/*
+	public void doDeleteConfirm(ActionRequest request, ActionResponse response) {
+
+		String res = request.getParameter(RESOURCE);
+		String origResource = request.getParameter(ORIGINAL_RESOURCE);
+		String chargeNum = request.getParameter(CHARGE_NUMBER);
+		String removeAll = request.getParameter(REMOVE_ALL);
+		String projNum = request.getParameter(PROJECT_IDX);
+		AddRemoveBean arb = new AddRemoveBean();
+		arb.setResource(res);
+		arb.setChargeNumber(chargeNum);
+		arb.setOrigResource(origResource);
+
+		String[] names = request.getParameterValues(USER);
+		if (names != null && names.length > 0) {
+			List<String> userList = new LinkedList<String>();
+			for (int i = 0; i < names.length; i++) {
+				userList.add(names[i]);
+			}
+			arb.setUserList(userList);
+		} else {
+			// Error PI did not select any users
+			// Return to allocations listing
+			response.setRenderParameter(STATUS, "");
+			response.setRenderParameter(ACTION, "");
+			return;
+		}
+		response.setRenderParameter(STATUS, CONFIRM);
+		response.setRenderParameter(ACTION, PI_DELETE);
+		PortletSession session = request.getPortletSession();
+		session.setAttribute(SESS_ADD_REM_BEAN, arb);
+		session.setAttribute(REMOVE_ALL, removeAll);
+		session.setAttribute(PROJECT_IDX, projNum);
+		logger.debug("doDeleteConfirm");
+	}
+*/
+
+/**
+ * Reads in form parameters, sets them to the bean variables, and confirm
+ * with user
+ */
+/*
+	public void doAddConfirm(ActionRequest request, ActionResponse response) {
+
+		String res = request.getParameter(RESOURCE);
+		String origResource = request.getParameter(ORIGINAL_RESOURCE);
+		String chargeNum = request.getParameter(CHARGE_NUMBER);
+
+		AddRemoveBean arb = new AddRemoveBean();
+		arb.setResource(res);
+		arb.setChargeNumber(chargeNum);
+		arb.setOrigResource(origResource);
+
+		String[] names = request.getParameterValues(USER);
+		if (names != null && names.length > 0) {
+			List<String> userList = new LinkedList<String>();
+			for (int i = 0; i < names.length; i++) {
+				userList.add(names[i]);
+			}
+			arb.setUserList(userList);
+		} else {
+			// Error PI did not select any users
+			// Go back to allocations listing b/c this situation shouldn't happen
+			response.setRenderParameter(STATUS, "");
+			response.setRenderParameter(ACTION, "");
+			return;
+		}
+		response.setRenderParameter(STATUS, CONFIRM);
+		response.setRenderParameter(ACTION, PI_ADD);
+		request.getPortletSession().setAttribute(SESS_ADD_REM_BEAN, arb);
+	}
+*/
+
+/**
+ * Sends email to admins to add users
+ */
+/*public void doDeleteComplete(ActionRequest request, ActionResponse response) {
+
+        PortletSession session = request.getPortletSession();
+        AddRemoveBean arb = (AddRemoveBean) session.getAttribute(SESS_ADD_REM_BEAN);
+
+        // Map userInfo = (Map) request.getAttribute(PortletRequest.USER_INFO);
+        // String piPortalUsername = (userInfo!=null) ? (String)
+        // userInfo.get("user.name") : "";
+
+        // Get username
+        String piPortalUsername = null;
+        try {
+            piPortalUsername = getPortalUsername(request);
+        } catch (Exception e) {
+            logger.error("Unable to retrieve portal username!", e);
+        }
+
+        // code to check for removeall and complete removeall
+        String removeAll = request.getParameter(REMOVE_ALL);
+        String proj = request.getParameter(PROJECT_IDX);
+        int projNum = Integer.parseInt(proj); // get the project number in projects[] for list of all allocations
+        if (removeAll.equals(REMOVE_ALL_YES) && arb != null) {
+            // get all params
+            String chargeNum = arb.getChargeNumber();
+            List<String> userList = arb.getUserList();
+            Project[] projects = null;
+            projects = (Project[]) session.getAttribute(SESS_PROJECT_LIST);
+
+            if ((projects == null) || (projects.length == 0)) { // If projects not available in session abort
+                logger.info("ERROR: In PI_DELETE_COMPLETE, cannot get projects[] from session");
+            } else {
+                // get allocations[] for project number from projects []
+                Allocation[] allocations = projects[projNum].getAllocations();
+                // WeakHashMap resShortNameHash = DBUtil.getShortNameMap();
+                // get the user from PI_delete user list
+                Iterator<String> it = userList.iterator();
+                while (it.hasNext()) {
+                    String item = (String) it.next();
+                    String[] fields = item.split("=");
+                    if (fields.length == 4) {
+                        String popsPersonId = fields[0];
+                        String personId = fields[1];
+                        String lastName = fields[2];
+                        String firstName = fields[3];
+
+                        String status = "pending";
+                        String action = "remove";
+
+                        // make a list of all allocations for the user
+                        List<String> userAllocList = new LinkedList<String>();
+                        for (int i = 0; i < allocations.length; i++) {
+                            // get allocation name
+                            String origResource = allocations[i].getResource();
+
+                            // if allocation is expired then ignore.
+                            if (allocations[i].isExpired()) {
+                                continue;
+                            }
+                            // get users list for the allocation
+                            User[] users = allocations[i].getUsers();
+                            // search for username in user list
+                            for (int u = 0; u < users.length; u++) {
+                                // if username matches then add allocation to hash map
+                                // logger.info("users[u].getLastName(): "+users[u].getLastName()+" users[u].getFirstName(): "+users[u].getFirstName());
+                                // logger.info("userListlastName: "+lastName+" userListfirstName: "+firstName);
+                                if (lastName.equals(users[u].getLastName())
+                                        && firstName.equals(users[u].getFirstName())) {
+                                    userAllocList.add(origResource);
+                                    logger.info(lastName + " " + firstName + " found in allocation. Resource added to allocationlist: " + origResource);
+                                    break;
+                                }
+                            }// end for(int u=0; u < users.length; u++)
+                        }// end for for(int i = 0; i < allocations.length; i++)
+
+                        // for each allocation of the user Add a row in the database
+                        int insertResult = 0;
+                        Iterator<String> it1 = userAllocList.iterator();
+                        while (it1.hasNext()) {
+                            String origResource = it1.next();
+                            try {
+                                PersonGateway pg = new PersonGatewayXSEDE();
+                                insertResult = pg.insertPiAddRemoveRequest(status, chargeNum, origResource, Integer.parseInt(personId), Integer.parseInt(popsPersonId), firstName, lastName, piPortalUsername, action);
+                                logger.info("Portal Username " + piPortalUsername + " is Adding to TGCDB: " + status + ", " + chargeNum + ", " + origResource + ", " + popsPersonId + ", " + firstName + ", " + lastName + ", " + action);
+                                logger.info("INSERT RESULT: " + insertResult);
+                                pg.close();
+                            } catch (SQLException e) {
+                                logger.error("Error", e);
+                            }
+                        }// end while(it1.hasnext); for each allocation of user
+
+                    }// if fields lenght == 4
+                }// end while(it.hasNext()); for each user in the PI_delete userlist
+
+                // remove session attributes no longer needed
+                session.removeAttribute(SESS_ADD_REM_BEAN);
+                session.removeAttribute(REMOVE_ALL);
+                session.removeAttribute(PROJECT_IDX);
+
+                // set render parameter
+                response.setRenderParameter(STATUS, COMPLETE);
+                response.setRenderParameter(ACTION, PI_DELETE);
+            }// end if projects == null
+        } else {
+            if (arb != null) {
+                String origResource = arb.getOrigResource();
+                String chargeNum = arb.getChargeNumber();
+                List<String> userList = arb.getUserList();
+
+                int insertResult = 0;
+
+                logger.info("***NEW REMOVE EXISTING USER REQUEST***");
+
+                Iterator<String> it = userList.iterator();
+                while (it.hasNext()) {
+                    String item = (String) it.next();
+                    String[] fields = item.split("=");
+                    if (fields.length == 4) {
+                        String popsPersonId = fields[0];
+                        String personId = fields[1];
+                        String lastName = fields[2];
+                        String firstName = fields[3];
+
+                        String status = "pending";
+                        String action = "remove";
+                        // Add a row in the database for this request
+                        try {
+                            PersonGateway pg = new PersonGatewayXSEDE();
+                            insertResult = pg.insertPiAddRemoveRequest(status, chargeNum, origResource, Integer.parseInt(personId), Integer.parseInt(popsPersonId), firstName, lastName, piPortalUsername, action);
+                            logger.info("Portal Username " + piPortalUsername + " is Adding to TGCDB: " + status + ", " + chargeNum + ", " + origResource + ", " + popsPersonId + ", " + firstName + ", " + lastName + ", " + action);
+                            logger.info("INSERT RESULT: " + insertResult);
+                            pg.close();
+                        } catch (SQLException e) {
+                            logger.error("Error", e);
+                        }
+                    }
+                }// close while
+
+                // remove session attributes no longer needed
+                session.removeAttribute(SESS_ADD_REM_BEAN);
+                session.removeAttribute(REMOVE_ALL);
+                session.removeAttribute(PROJECT_IDX);
+
+                response.setRenderParameter(STATUS, COMPLETE);
+                response.setRenderParameter(ACTION, PI_DELETE);
+            }
+        } // end if removal == yes //pNut200906
+    }
+*/
+/**
+ * Sends email to admins to add users
+ */
+/*
+	public void doAddComplete(ActionRequest request, ActionResponse response) {
+		PortletSession session = request.getPortletSession();
+		AddRemoveBean arb = (AddRemoveBean) session.getAttribute(SESS_ADD_REM_BEAN);
+
+		// Map userInfo = (Map) request.getAttribute(PortletRequest.USER_INFO);
+		// String piPortalUsername = (userInfo!=null) ? (String) userInfo.get("user.name") : "";
+
+		// Get username
+		String piPortalUsername = null;
+		try {
+			piPortalUsername = getPortalUsername(request);
+		} catch (Exception e) {
+			logger.error("Unable to retrieve portal username!", e);
+		}
+		int insertResult = 0;
+
+		if (arb != null) {
+			String origResource = arb.getOrigResource();
+			String chargeNum = arb.getChargeNumber();
+			List<String> userList = arb.getUserList();
+
+			Iterator<String> it = userList.iterator();
+
+			logger.info("***NEW ADD EXISTING USER REQUEST***");
+
+			while (it.hasNext()) {
+				String item = (String) it.next();
+				String[] fields = item.split("=");
+				if (fields.length == 4) {
+					String popsPersonId = fields[0];
+					String personId = fields[1];
+					String lastName = fields[2];
+					String firstName = fields[3];
+					String status = "pending";
+					String action = "add";
+
+					// Add a row in the database for this request
+					try {
+						PersonGateway pg = new PersonGatewayXSEDE();
+						insertResult = pg.insertPiAddRemoveRequest(status, chargeNum, origResource, Integer.parseInt(personId), Integer.parseInt(popsPersonId), firstName, lastName, piPortalUsername, action);
+						pg.close();
+						logger.info("Portal Username " + piPortalUsername + " is Adding to TGCDB: " + status + ", " + chargeNum + ", " + origResource + ", " + popsPersonId + ", " + firstName + ", " + lastName + ", " + action);
+						logger.info("INSERT RESULT: " + insertResult);
+					} catch (SQLException e) {
+						logger.error("Error", e);
+					}
+				}// close if
+			}// close while
+
+			session.removeAttribute(SESS_ADD_REM_BEAN);
+			response.setRenderParameter(STATUS, COMPLETE);
+			response.setRenderParameter(ACTION, PI_ADD);
+		}
+	}
+*/
