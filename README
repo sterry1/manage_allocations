@@ -1,0 +1,3 @@
+This project is a port of an XSEDE allocations management portlet to a TACC User portal portlet with a lot of similiar functionality.
+
+Development environment setup and deployment documentation can be found in the portal project for TUP.
